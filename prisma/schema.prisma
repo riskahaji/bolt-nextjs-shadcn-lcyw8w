@@ -1,0 +1,79 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  username      String    @unique
+  password      String
+  role          Role      @default(USER)
+  adminCode     String?
+  incidents     Incident[]
+  reports       Report[]
+  information   Information[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Incident {
+  id          String   @id @default(cuid())
+  incidentId  String   @unique
+  date        DateTime
+  actor       String
+  target      String
+  type        String
+  description String
+  location    String
+  casualties  Int
+  status      Status   @default(PENDING)
+  institute   String
+  submittedBy User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  reportId    String   @unique
+  date        DateTime
+  about       String
+  description String
+  location    String
+  status      Status   @default(PENDING)
+  institute   String
+  submittedBy User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Information {
+  id          String   @id @default(cuid())
+  infoId      String   @unique
+  date        DateTime
+  status      String
+  description String
+  location    String
+  institute   String
+  submittedBy User     @relation(fields: [userId], references: [id])
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
